@@ -1,0 +1,60 @@
+<!doctype html>
+<html th:fragment="layout (template, menu)">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>StudentManagement</title>
+  
+</head>
+
+<body>
+
+  <nav>
+    <div class="headerbackground">
+      <div>
+        <a th:href="@{/}" class="maintitle"><span>StudentManagement</span></a>
+      </div>
+      
+      <div>
+        <ul class="menu">
+
+          <li th:fragment="menuItem (path,active,title,glyph,text)" class="active"
+            th:class="${active==menu ? 'active' : ''}">
+            <a th:href="@{__${path}__}" th:title="${title}">
+              <span th:class="'glyphicon  glyphicon-'+${glyph}" class="glyphicon glyphicon-home"
+                aria-hidden="true"></span>
+              <span th:text="${text}">Template</span>
+            </a>
+          </li>
+
+          <li th:replace="::menuItem ('/','home','home page','home','Home')">
+            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+            <span>Home</span>
+          </li>
+
+          <li th:replace="::menuItem ('/students/find','students','find students','search','Find students')">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            <span>Find Student</span>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div>
+    <div>
+      <th:block th:include="${template}" />
+
+      <br />
+      <br />
+      <div>
+        <p>StudentManagement.org</p>
+      </div>
+    
+    </div>
+  </div>
+</body>
+
+
+</html>
