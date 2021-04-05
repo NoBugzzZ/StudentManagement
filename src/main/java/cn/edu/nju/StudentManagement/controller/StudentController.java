@@ -9,14 +9,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import cn.edu.nju.StudentManagement.db.DAO;
 import cn.edu.nju.StudentManagement.model.Student;
+import cn.edu.nju.StudentManagement.repository.StudentRepository;
 
 @Controller
 public class StudentController {
 
-    private String databaseName="src/main/resources/db/student";
-    private String tableName="stuinfo";
+    private final StudentRepository studentRepository;
+
+    public StudentController(StudentRepository studentRepository){
+        this.studentRepository=studentRepository;
+    }
 
     @GetMapping("/students/new")
 	public String initCreationForm(Map<String, Object> model) {
@@ -27,11 +30,10 @@ public class StudentController {
 
 	@PostMapping("/students/new")
 	public String processCreationForm(Student student) {
-        DAO dao=new DAO(databaseName, tableName);
-        if(dao.findById(student.getId())==null){
-            dao.insert(student);
-            dao.closeConnection();
-			return "redirect:/students/" + student.getId();
+        Student stu=studentRepository.findByStudentId(student.getStudentId());
+        if(stu==null){
+            studentRepository.save(student);
+			return "redirect:/students/" + student.getStudentId();
         }
 		else {
             return "students/createStudent";
@@ -41,27 +43,22 @@ public class StudentController {
     @GetMapping("/students/{studentId}/modify")
 	public String initModifyForm(@PathVariable("studentId") String studentId,Model model) {
         Student student=new Student();
-        student.setId(studentId);
+        student.setStudentId(studentId);
 		model.addAttribute(student);
 		return "students/modifyStudent";
 	}
 
 	@PostMapping("/students/{studentId}/modify")
 	public String processModifyForm(@PathVariable("studentId") String studentId,Student student) {
-        DAO dao=new DAO(databaseName,tableName);
-        //student.setId(studentId);
-        dao.modify(student);
-        dao.closeConnection();
-		return "redirect:/students/" + student.getId();
+        student.setId(studentRepository.findByStudentId(studentId).getId());
+        studentRepository.save(student);
+		return "redirect:/students/" + student.getStudentId();
 	}
 
     @GetMapping("/students/{studentId}/delete")
 	public String processDelete(@PathVariable("studentId") String studentId,Map<String, Object> model) {
-        DAO dao=new DAO(databaseName,tableName);
-        dao.delete(studentId);
-        LinkedList<Student> students=new LinkedList<Student>();
-		students=dao.findAll();
-        dao.closeConnection();
+        studentRepository.delete(studentRepository.findByStudentId(studentId));
+        List<Student> students=studentRepository.findAll();
         model.put("students", students);
 		return "students/studentsList";
 	}
@@ -75,23 +72,16 @@ public class StudentController {
     @GetMapping("/students")
 	public String processFindForm(Student student,Map<String, Object> model) {
 
-		// allow parameterless GET request for /owners to return all records
-		if (student.getId() == "") {
-            LinkedList<Student> students=new LinkedList<Student>();
-		    DAO dao=new DAO(databaseName, tableName);
-		    students=dao.findAll();
-            dao.closeConnection();
+		if (student.getStudentId() == "") {
+            List<Student> students=studentRepository.findAll();
             model.put("students", students);
 			return "students/studentsList";
 		}else{
-            Student stu=new Student();
-            DAO dao=new DAO(databaseName, tableName);
-            stu=dao.findById(student.getId());
-            dao.closeConnection();
-            if(stu.getName().isEmpty()){
-			    return "owners/findOwners";
+            Student stu=studentRepository.findByStudentId(student.getStudentId());
+            if(stu==null){
+			    return "students/findStudents";
             }else{
-                return "redirect:/students/" + stu.getId();
+                return "redirect:/students/" + stu.getStudentId();
             }
         }
 
@@ -100,10 +90,7 @@ public class StudentController {
     @GetMapping("/students/{studentId}")
 	public ModelAndView showOwner(@PathVariable("studentId") String studentId) {
 		ModelAndView mav = new ModelAndView("students/studentDetails");
-		Student student=new Student();
-        DAO dao=new DAO(databaseName, tableName);
-        student=dao.findById(studentId);
-        dao.closeConnection();
+        Student student=studentRepository.findByStudentId(studentId);
 		mav.addObject(student);
 		return mav;
 	}

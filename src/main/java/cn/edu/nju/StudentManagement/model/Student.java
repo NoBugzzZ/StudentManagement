@@ -1,20 +1,39 @@
 package cn.edu.nju.StudentManagement.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="student")
 public class Student {
-    private String id;
+    @Id
+    private int id;
+
+    @Column(name = "student_id")
+    private String studentId;
+
+    @Column(name = "student_name")
     private String name;
+
+    @Column(name = "sex")
     private String sex;
+
+    @Column(name = "birthday")
     private String birthday;
+
+    @Column(name = "native_place")
     private String nativePlace;
+
+    @Column(name = "department")
     private String department;
 
-    //private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -57,5 +76,13 @@ public class Student {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
 }

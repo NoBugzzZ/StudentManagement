@@ -5,37 +5,26 @@
   <meta charset="utf-8">
 
   <title>StudentManagement</title>
-  
+  <link rel="stylesheet" th:href="@{/css/mystyle.css}"/>
 </head>
 
 <body>
 
   <nav>
-    <div class="headerbackground">
+    <div>
       <div>
-        <a th:href="@{/}" class="maintitle"><span>StudentManagement</span></a>
+        <a th:href="@{/}"><span>StudentManagement</span></a>
       </div>
       
       <div>
-        <ul class="menu">
+        <ul>
 
-          <li th:fragment="menuItem (path,active,title,glyph,text)" class="active"
-            th:class="${active==menu ? 'active' : ''}">
-            <a th:href="@{__${path}__}" th:title="${title}">
-              <span th:class="'glyphicon  glyphicon-'+${glyph}" class="glyphicon glyphicon-home"
-                aria-hidden="true"></span>
-              <span th:text="${text}">Template</span>
-            </a>
+          <li>
+            <a th:href="@{/}"><span>Home</span></a>
           </li>
 
-          <li th:replace="::menuItem ('/','home','home page','home','Home')">
-            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-            <span>Home</span>
-          </li>
-
-          <li th:replace="::menuItem ('/students/find','students','find students','search','Find students')">
-            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-            <span>Find Student</span>
+          <li>
+            <a th:href="@{/students/find}"><span>Find Student</span></a>
           </li>
 
         </ul>
@@ -44,6 +33,7 @@
   </nav>
   <div>
     <div>
+      
       <th:block th:include="${template}" />
 
       <br />

@@ -11,7 +11,7 @@
     <table>
         <tr>
             <th>Id</th>
-            <td><b th:text="*{id}"></b></td>
+            <td><b th:text="*{studentId}"></b></td>
         </tr>
         <tr>
         <th>Name</th>
@@ -39,8 +39,8 @@
         </tr>
     </table>
 
-    <a th:href="@{{id}/modify(id=${student.id})}" method="get">Modify Student</a>
-    <a th:href="@{{id}/delete(id=${student.id})}" method="get">Delete Student</a>
+    <a th:href="@{{studentId}/modify(studentId=${student.studentId})}" method="get">Modify Student</a>
+    <a th:href="@{{studentId}/delete(studentId=${student.studentId})}" method="get">Delete Student</a>
     </div>
   
   </body>
