@@ -17,7 +17,7 @@
     </thead>
     <tbody>
       <tr th:each="student : ${students}">
-        <td th:text="${student.studentId}"></td>
+        <td><a th:text="${student.studentId}" th:href="@{/students/{studentId}(studentId=${student.studentId})}" method="get"></a></td>
         <td th:text="${student.name}"></td>
         <td th:text="${student.sex}"></td>
         <td th:text="${student.birthday}"></td>
