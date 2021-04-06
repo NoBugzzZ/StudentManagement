@@ -13,8 +13,7 @@ public interface StudentRepository extends Repository<Student, Integer> {
     @Transactional(readOnly = true)
     public List<Student> findAll();
 
-    //@Query("SELECT stu FROM student stu WHERE stu.studentId=:studentId")
-    //@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Student findByStudentId(String studentId);
 
     void save(Student student) throws DataAccessException;

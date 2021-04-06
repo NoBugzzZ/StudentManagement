@@ -2,6 +2,7 @@ package cn.edu.nju.StudentManagement.controller;
 
 import java.util.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,16 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import cn.edu.nju.StudentManagement.model.Student;
-import cn.edu.nju.StudentManagement.repository.StudentRepository;
+import cn.edu.nju.StudentManagement.service.StudentService;
 
 @Controller
 public class StudentController {
 
-    private final StudentRepository studentRepository;
-
-    public StudentController(StudentRepository studentRepository){
-        this.studentRepository=studentRepository;
-    }
+	@Autowired
+	private StudentService studentService;
 
     @GetMapping("/students/new")
 	public String initCreationForm(Map<String, Object> model) {
@@ -30,9 +28,9 @@ public class StudentController {
 
 	@PostMapping("/students/new")
 	public String processCreationForm(Student student) {
-        Student stu=studentRepository.findByStudentId(student.getStudentId());
+        Student stu=studentService.findByStudentId(student.getStudentId());
         if(stu==null){
-            studentRepository.save(student);
+            studentService.save(student);
 			return "redirect:/students/" + student.getStudentId();
         }
 		else {
@@ -50,15 +48,15 @@ public class StudentController {
 
 	@PostMapping("/students/{studentId}/modify")
 	public String processModifyForm(@PathVariable("studentId") String studentId,Student student) {
-        student.setId(studentRepository.findByStudentId(studentId).getId());
-        studentRepository.save(student);
+        student.setId(studentService.findByStudentId(studentId).getId());
+        studentService.save(student);
 		return "redirect:/students/" + student.getStudentId();
 	}
 
     @GetMapping("/students/{studentId}/delete")
 	public String processDelete(@PathVariable("studentId") String studentId,Map<String, Object> model) {
-        studentRepository.delete(studentRepository.findByStudentId(studentId));
-        List<Student> students=studentRepository.findAll();
+        studentService.delete(studentService.findByStudentId(studentId));
+        List<Student> students=studentService.findAll();
         model.put("students", students);
 		return "students/studentsList";
 	}
@@ -73,11 +71,11 @@ public class StudentController {
 	public String processFindForm(Student student,Map<String, Object> model) {
 
 		if (student.getStudentId() == "") {
-            List<Student> students=studentRepository.findAll();
+            List<Student> students=studentService.findAll();
             model.put("students", students);
 			return "students/studentsList";
 		}else{
-            Student stu=studentRepository.findByStudentId(student.getStudentId());
+            Student stu=studentService.findByStudentId(student.getStudentId());
             if(stu==null){
 			    return "students/findStudents";
             }else{
@@ -90,7 +88,7 @@ public class StudentController {
     @GetMapping("/students/{studentId}")
 	public ModelAndView showOwner(@PathVariable("studentId") String studentId) {
 		ModelAndView mav = new ModelAndView("students/studentDetails");
-        Student student=studentRepository.findByStudentId(studentId);
+        Student student=studentService.findByStudentId(studentId);
 		mav.addObject(student);
 		return mav;
 	}
