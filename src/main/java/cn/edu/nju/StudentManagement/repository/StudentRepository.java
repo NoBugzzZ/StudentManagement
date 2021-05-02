@@ -1,23 +1,20 @@
 package cn.edu.nju.StudentManagement.repository;
 
-import java.util.List;
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.repository.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.data.jpa.repository.JpaRepository;
 import cn.edu.nju.StudentManagement.model.Student;
 
-public interface StudentRepository extends Repository<Student, Integer> {
+public interface StudentRepository extends JpaRepository<Student, Long> {
 
-    @Transactional(readOnly = true)
-    public List<Student> findAll();
+    // @Transactional(readOnly = true)
+    // public List<Student> findAll();
 
-    //@Query("SELECT stu FROM student stu WHERE stu.studentId=:studentId")
-    //@Transactional(readOnly = true)
-    public Student findByStudentId(String studentId);
+    // @Transactional(readOnly = true)
+    // public Student findById(Long id);
 
-    void save(Student student) throws DataAccessException;
+    // @Transactional(readOnly = true)
+    // public Student findByStudentId(String studentId);
 
-    void delete(Student student) throws DataAccessException;
+    // public Student save(Student student) throws DataAccessException;
+
+    // void delete(Student student) throws DataAccessException;
 }

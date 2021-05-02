@@ -1,97 +1,90 @@
 package cn.edu.nju.StudentManagement.controller;
 
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import cn.edu.nju.StudentManagement.Exception.StudentNotFoundException;
+import cn.edu.nju.StudentManagement.assembler.StudentModelAssembler;
 import cn.edu.nju.StudentManagement.model.Student;
 import cn.edu.nju.StudentManagement.repository.StudentRepository;
 
-@Controller
+@RestController
 public class StudentController {
 
-    private final StudentRepository studentRepository;
+	private final StudentRepository repository;
+	private final StudentModelAssembler assembler;
 
-    public StudentController(StudentRepository studentRepository){
-        this.studentRepository=studentRepository;
-    }
-
-    @GetMapping("/students/new")
-	public String initCreationForm(Map<String, Object> model) {
-		Student student = new Student();
-		model.put("student", student);
-		return "students/createStudent";
+	public StudentController(StudentRepository repository, StudentModelAssembler assembler) {
+		this.repository = repository;
+		this.assembler = assembler;
 	}
 
-	@PostMapping("/students/new")
-	public String processCreationForm(Student student) {
-        Student stu=studentRepository.findByStudentId(student.getStudentId());
-        if(stu==null){
-            studentRepository.save(student);
-			return "redirect:/students/" + student.getStudentId();
-        }
-		else {
-            return "students/createStudent";
-		}
+	@GetMapping("/students")
+	public CollectionModel<EntityModel<Student>> all() {
+		List<EntityModel<Student>> students = repository.findAll().stream()
+			.map(assembler::toModel)
+			.collect(Collectors.toList());
+		return CollectionModel.of(students, linkTo(methodOn(StudentController.class).all()).withSelfRel());
 	}
 
-    @GetMapping("/students/{studentId}/modify")
-	public String initModifyForm(@PathVariable("studentId") String studentId,Model model) {
-        Student student=new Student();
-        student.setStudentId(studentId);
-		model.addAttribute(student);
-		return "students/modifyStudent";
+	@PostMapping("/students")
+	public ResponseEntity<?> newStudent(@RequestBody Student newStudent) {
+		EntityModel<Student> entityModel = assembler.toModel(repository.save(newStudent));
+		return ResponseEntity //
+			.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
+			.body(entityModel);
 	}
 
-	@PostMapping("/students/{studentId}/modify")
-	public String processModifyForm(@PathVariable("studentId") String studentId,Student student) {
-        student.setId(studentRepository.findByStudentId(studentId).getId());
-        studentRepository.save(student);
-		return "redirect:/students/" + student.getStudentId();
+	@GetMapping("/students/{id}")
+	public EntityModel<Student> one(@PathVariable Long id) {
+		Student student = repository.findById(id) //
+      		.orElseThrow(() -> new StudentNotFoundException(id));
+
+		return assembler.toModel(student);
 	}
 
-    @GetMapping("/students/{studentId}/delete")
-	public String processDelete(@PathVariable("studentId") String studentId,Map<String, Object> model) {
-        studentRepository.delete(studentRepository.findByStudentId(studentId));
-        List<Student> students=studentRepository.findAll();
-        model.put("students", students);
-		return "students/studentsList";
-	}
+	@PutMapping("/students/{id}")
+	public ResponseEntity<?> replaceStudent(@RequestBody Student newStudent, @PathVariable Long id) {
+		Student updatedStudent = repository.findById(id) //
+			.map(student -> {
+				student.setStudentId(newStudent.getStudentId());
+				student.setName(newStudent.getName());
+				student.setSex(newStudent.getSex());
+				student.setBirthday(newStudent.getBirthday());
+				student.setNativePlace(newStudent.getNativePlace());
+				student.setDepartment(newStudent.getDepartment());
+				return repository.save(student);
+			}) //
+			.orElseGet(() -> {
+				newStudent.setId(id);
+				return repository.save(newStudent);
+			});
 
-    @GetMapping("/students/find")
-	public String initFindForm(Map<String, Object> model) {
-        model.put("student", new Student());
-		return "students/findStudents";
-    }
+		EntityModel<Student> entityModel = assembler.toModel(updatedStudent);
 
-    @GetMapping("/students")
-	public String processFindForm(Student student,Map<String, Object> model) {
+		return ResponseEntity //
+			.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
+			.body(entityModel);
+  }
 
-		if (student.getStudentId() == "") {
-            List<Student> students=studentRepository.findAll();
-            model.put("students", students);
-			return "students/studentsList";
-		}else{
-            Student stu=studentRepository.findByStudentId(student.getStudentId());
-            if(stu==null){
-			    return "students/findStudents";
-            }else{
-                return "redirect:/students/" + stu.getStudentId();
-            }
-        }
-
-	}
-
-    @GetMapping("/students/{studentId}")
-	public ModelAndView showOwner(@PathVariable("studentId") String studentId) {
-		ModelAndView mav = new ModelAndView("students/studentDetails");
-        Student student=studentRepository.findByStudentId(studentId);
-		mav.addObject(student);
-		return mav;
+	@DeleteMapping("/students/{id}")
+	public ResponseEntity<?> deleteStudent(@PathVariable Long id) {
+		repository.deleteById(id);
+		return ResponseEntity.noContent().build();
 	}
 }

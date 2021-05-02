@@ -9,10 +9,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="student")
-public class Student {
+public class Student{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "student_id")
     private String studentId;
@@ -32,12 +33,20 @@ public class Student {
     @Column(name = "department")
     private String department;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
 
     public String getName() {
@@ -62,7 +71,6 @@ public class Student {
 
     public void setBirthday(String birthday) {
         this.birthday = birthday;
-
     }
 
     public String getNativePlace() {
@@ -81,11 +89,4 @@ public class Student {
         this.department = department;
     }
 
-    public String getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
-    }
 }
