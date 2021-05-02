@@ -1,9 +1,9 @@
 #### 查询所有学生信息
-url: `/students`
+url: `/students`  
 method: `GET`
 
 #### 查询单个学生信息
-url: `/students/{id}`
+url: `/students/{id}`  
 method: `GET`
 
 #### 添加学生信息
