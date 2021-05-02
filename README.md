@@ -7,9 +7,9 @@ url: `/students/{id}`
 method: `GET`
 
 #### 添加学生信息
-url: `/students`
-method: `POST`
-说明: 请求体内需要包含json格式的数据，示例如下
+url: `/students`  
+method: `POST`  
+说明: 请求体内需要包含json格式的数据，示例如下  
 ```
 {
     "studentId": "MF20330073",
@@ -22,10 +22,10 @@ method: `POST`
 ```
 
 #### 修改学生信息
-url: `/students/{id}`
-method: `PUT`
-说明: 请求体内需要和添加学生信息相同的数据格式
+url: `/students/{id}`  
+method: `PUT`  
+说明: 请求体内需要和添加学生信息相同的数据格式  
 
 #### 删除学生信息
-url: `/students/{id}`
-method: `DELETE`
+url: `/students/{id}`  
+method: `DELETE`  
