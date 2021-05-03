@@ -1,0 +1,50 @@
+<!doctype html>
+<html th:fragment="layout (template, menu)">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>StudentManagement</title>
+  <link rel="stylesheet" th:href="@{/css/mystyle.css}"/>
+</head>
+
+<body>
+
+  <nav>
+    <div>
+      <div>
+        <a th:href="@{/}"><span>StudentManagement</span></a>
+      </div>
+      
+      <div>
+        <ul>
+
+          <li>
+            <a th:href="@{/}"><span>Home</span></a>
+          </li>
+
+          <li>
+            <a th:href="@{/students/find}"><span>Find Student</span></a>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div>
+    <div>
+      
+      <th:block th:include="${template}" />
+
+      <br />
+      <br />
+      <div>
+        <p>StudentManagement.org</p>
+      </div>
+    
+    </div>
+  </div>
+</body>
+
+
+</html>
